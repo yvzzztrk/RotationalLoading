@@ -1,12 +1,18 @@
 package com.yavuz.rotationalloading;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -20,48 +26,69 @@ public class RotationalLoading {
     private AppCompatActivity activity;
 
     private int drawableID;
-    private int layoutID;
-    private int animationID;
     private boolean isCancelable = false;
+    private int numberOfRotatesPerSecond = 1;
 
     private Dialog dialog;
+    private ImageView imageView;
 
-    public RotationalLoading(AppCompatActivity activity, int drawableID, int layoutID, int animationID, boolean isCancelable) {
+    public RotationalLoading(AppCompatActivity activity, int drawableID, boolean isCancelable) {
         this.activity = activity;
         this.drawableID = drawableID;
-        this.layoutID = layoutID;
-        this.animationID = animationID;
         this.isCancelable = isCancelable;
     }
 
-    public RotationalLoading(AppCompatActivity activity, int drawableID, int layoutID, int animationID) {
+    public RotationalLoading(AppCompatActivity activity, int drawableID) {
         this.activity = activity;
         this.drawableID = drawableID;
-        this.layoutID = layoutID;
-        this.animationID = animationID;
-        initializeDialog();
     }
 
     public void initializeDialog() {
-        Dialog dialog = new Dialog(this.activity, R.style.RotationalLoadingTheme);
-        dialog.setContentView(this.layoutID);
+
+        Dialog dialog = new Dialog(this.activity);
         dialog.setCancelable(this.isCancelable);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
-        ImageView image = (ImageView) dialog.findViewById(R.id.image);
-        image.setImageDrawable(ContextCompat.getDrawable(this.activity, this.drawableID));
-        RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) image.getLayoutParams();
+        ViewGroup.LayoutParams viewGroupLayoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        RelativeLayout relativeLayout = new RelativeLayout(dialog.getContext());
+        relativeLayout.setLayoutParams(viewGroupLayoutParams);
+        relativeLayout.setGravity(Gravity.CENTER);
+        relativeLayout.setBackgroundColor(ContextCompat.getColor(this.activity, android.R.color.transparent));
 
-        lParams.height = this.activity.getResources().getDisplayMetrics().widthPixels / 3;
-        lParams.width = this.activity.getResources().getDisplayMetrics().widthPixels / 3;
+        RelativeLayout.LayoutParams relativeLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        relativeLayoutParams.height = this.activity.getResources().getDisplayMetrics().widthPixels / 3;
+        relativeLayoutParams.width = this.activity.getResources().getDisplayMetrics().widthPixels / 3;
 
-        image.setLayoutParams(lParams);
+        imageView = new ImageView(dialog.getContext());
+        imageView.setLayoutParams(relativeLayoutParams);
+        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        imageView.setImageDrawable(ContextCompat.getDrawable(this.activity, this.drawableID));
+        relativeLayout.addView(imageView);
 
-        Animation rotation = AnimationUtils.loadAnimation(this.activity, this.animationID);
-        rotation.setRepeatCount(Animation.INFINITE);
-        image.startAnimation(rotation);
+        dialog.setContentView(relativeLayout);
+
+        final AnimationSet animationSet = new AnimationSet(true);
+        animationSet.setInterpolator(new LinearInterpolator());
+        animationSet.setFillAfter(true);
+        animationSet.setFillEnabled(true);
+
+        RotateAnimation rotateAnimation = new RotateAnimation(0.0f, 360.0f, RotateAnimation.RELATIVE_TO_SELF, 0.5f, RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+
+        rotateAnimation.setDuration(1000 / this.numberOfRotatesPerSecond);
+        rotateAnimation.setRepeatCount(Animation.INFINITE);
+        rotateAnimation.setFillAfter(true);
+
+        animationSet.addAnimation(rotateAnimation);
+
+        imageView.startAnimation(animationSet);
 
         this.dialog = dialog;
+        this.dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                imageView.startAnimation(animationSet);
+            }
+        });
     }
 
     public void show() {
@@ -81,17 +108,26 @@ public class RotationalLoading {
     }
 
     public void setHeight(int heightPixels) {
-        ImageView image = (ImageView) dialog.findViewById(R.id.image);
-        RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) image.getLayoutParams();
+        RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) this.imageView.getLayoutParams();
         lParams.height = heightPixels;
-        lParams.width = this.activity.getResources().getDisplayMetrics().widthPixels / 3;
-        image.setLayoutParams(lParams);
+        this.imageView.setLayoutParams(lParams);
     }
 
     public void setWidth(int widthPixels) {
-        ImageView image = (ImageView) dialog.findViewById(R.id.image);
-        RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) image.getLayoutParams();
+        RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) this.imageView.getLayoutParams();
         lParams.width = widthPixels;
-        image.setLayoutParams(lParams);
+        this.imageView.setLayoutParams(lParams);
+    }
+
+    public void setOnClickListener(View.OnClickListener listener) {
+        this.imageView.setOnClickListener(listener);
+    }
+
+    public void setNumberOfRotatesPerSecond(int numberOfRotatesPerSecond) {
+        this.numberOfRotatesPerSecond = numberOfRotatesPerSecond;
+    }
+
+    public void setIsCancelable(boolean isCancelable) {
+        this.isCancelable = isCancelable;
     }
 }

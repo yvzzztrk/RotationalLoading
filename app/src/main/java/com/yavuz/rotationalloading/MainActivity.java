@@ -8,7 +8,6 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int SHOW_TIME = 5000;
     Button buttonShow;
     RotationalLoading rotationalLoading;
 
@@ -18,22 +17,27 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        rotationalLoading = new RotationalLoading(this,
-                R.drawable.doge,
-                R.layout.rotational_loading,
-                R.anim.rotation);
+        rotationalLoading = new RotationalLoading(this, R.mipmap.ic_launcher); //create instance
+
+        rotationalLoading.setNumberOfRotatesPerSecond(3); // set these before initializeDialog();
+        rotationalLoading.setIsCancelable(true);
+
+        rotationalLoading.initializeDialog();
+
+        rotationalLoading.setHeight(300); // set these after initializeDialog();
+        rotationalLoading.setWidth(300);
+        rotationalLoading.setOnClickListener(new View.OnClickListener() { // set click listener after initalizeDialog()
+            @Override
+            public void onClick(View v) {
+                rotationalLoading.hide();
+            }
+        });
 
         buttonShow = (Button) findViewById(R.id.buttonShow);
         buttonShow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 rotationalLoading.show();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        rotationalLoading.hide();
-                    }
-                }, SHOW_TIME);
             }
         });
     }
