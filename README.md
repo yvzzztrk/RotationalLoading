@@ -2,7 +2,7 @@
 
 One simple java class for android to show dialog with rotating an image.
 
-![My image](https://cloud.githubusercontent.com/assets/10367982/12048319/615355d2-aee2-11e5-925a-d38b7691db7f.gif)
+![My image](https://cloud.githubusercontent.com/assets/10367982/12048319/615355d2-aee2-11e5-925a-d38b7691db7f.gif=300x)
 
 ## Code Example
 
