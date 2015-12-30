@@ -2,6 +2,8 @@
 
 One simple java class for android to show dialog with rotating an image.
 
+![My image](yvzzztrk.github.com/RotationalLoading/sample.gif)
+
 ## Code Example
 
 Look at the MainActivity.java
