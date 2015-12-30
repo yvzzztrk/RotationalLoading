@@ -19,7 +19,7 @@ Tested and used only with support library.
 ## Licence
 
 ```
-Copyright 2015 Yavuz Öztürk
+Copyright [2016] [Yavuz Öztürk]
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
